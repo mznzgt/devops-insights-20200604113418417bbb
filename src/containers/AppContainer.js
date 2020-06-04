@@ -1,38 +1,59 @@
 import React, { useState } from 'react';
-import fetch from 'isomorphic-unfetch'
-import ZipResponse from '../components/ZipResponse';
-import Zip from '../components/Zip';
+import ReactMapGL, { Marker } from 'react-map-gl';
 
-function AppContainer(props) {
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiYmdyZWVudyIsImEiOiJja2F5bHRjYWswaWFhMnh0MDY3eTFqOHV1In0.ilXA9X2hebhSbUCzH9yj-A';
 
-    const [responseData, setResponseData] = useState('');
-
-    const handleZipChange = async (zipValue) => {
-        //console.log(`--------- fetchData called zip:${zipValue}`)
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?appid=6b7b471967dd0851d0010cdecf28f829&units=imperial&zip=${zipValue},us`)
-        const json = await res.json()
-        //console.log(json);
-        setResponseData(json);
+function Map(props) {
+    // Handles when the map is clicked
+    const onClick = e => {
+        props.onMapClick(e.lngLat)
     }
 
-    const clearResponse = () => {
-        setResponseData('');
+    // Default map settings
+    let [viewport, setViewport] = useState({
+        width: 800,
+        height: 800,
+        latitude: -41.7618757,
+        longitude: 172.4553581,
+        zoom: 5
+    });
+    
+    // Create marker if a city is selected
+    let marker;
+    if(props.responseData && props.responseData.cod === 200) {
+        let data = {
+            latitude: parseFloat(props.responseData.coord.lat),
+            longitude: parseFloat(props.responseData.coord.lon),
+            offsetLeft: -10,
+            offsetTop: -20
+        }
+
+        marker = (
+            <Marker {...data}>
+                <img src="/pin.png" alt="map pin" className="map-icon" />
+            </Marker>
+        );
+
+        viewport = {
+            ...viewport,
+            latitude: data.latitude,
+            longitude: data.longitude,
+            zoom: 11.5
+        };
     }
 
+    // Render the map and marker if available
     return (
-        <div>
-            <div className="row mt-4">
-                <div className="col-sm-4"></div>
-                <Zip onZipChange={handleZipChange} clearResponse={clearResponse}/>
-                <div className="col-sm-4"></div>
-            </div>
-            <div className="row mt-4">
-                <div className="col-sm-2"></div>
-                <ZipResponse responseData={responseData} clearResponse={clearResponse}/>
-                <div className="col-sm-2"></div>
-            </div>    
-        </div>
-    );
+        <ReactMapGL
+            { ...viewport }
+            onViewportChange = { nextViewport => setViewport(nextViewport) }
+            mapboxApiAccessToken = { MAPBOX_TOKEN }
+            mapStyle = 'mapbox://styles/mapbox/streets-v11'
+            onClick = {onClick}
+        >
+            { marker || '' }
+        </ReactMapGL>
+    )
 }
   
-export default AppContainer
+export default Map

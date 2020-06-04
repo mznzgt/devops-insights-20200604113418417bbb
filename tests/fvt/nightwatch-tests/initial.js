@@ -10,29 +10,29 @@ module.exports = {
         .end(done);
     },
 
-    'Navigate to the DemoDOI - valid zip': async (browser) => {
+    'Navigate to the DemoDOI - valid city name': async (browser) => {
         const demodoi = browser.page.demodoi();
         const { cityName } = demodoi.section;
     
         await demodoi.navigate().waitForElementVisible('@inputText');
 
         await demodoi.setValue('@inputText', [
-            '78641',
+            'Hamilton',
             browser.Keys.ENTER
           ]);
     
         await demodoi.waitForElementVisible('@table');
 
-        cityName.expect.element('@firstApp').text.to.equal('Leander');
+        cityName.expect.element('@firstApp').text.to.equal('Hamilton');
     },
 
-    'Navigate to the DemoDOI - invalid zip': async (browser) => {
+    'Navigate to the DemoDOI - invalid city name': async (browser) => {
         const demodoi = browser.page.demodoi();
     
         await demodoi.navigate().waitForElementVisible('@inputText');
 
         await demodoi.setValue('@inputText', [
-            '90000',
+            'New York',
             browser.Keys.ENTER
           ]);
     
@@ -47,12 +47,12 @@ module.exports = {
         await demodoi.navigate().waitForElementVisible('@inputText');
 
         await demodoi.setValue('@inputText', [
-            'ABCDE',
+            '12345',
             browser.Keys.ENTER
           ]);
     
         await demodoi.waitForElementNotPresent('@table');
 
-        demodoi.expect.element('@invalidCity').text.to.equal('* should be a 5 digit number only');
+        demodoi.expect.element('@invalidCity').text.to.equal('* should be letters and spaces only');
     },
 };

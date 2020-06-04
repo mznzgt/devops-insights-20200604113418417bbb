@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 
-function Zip(props) {
+function City(props) {
 
     const [validationError, setValidationError] = useState(null);
 
     const validate = (event) => {
-        const zipCodePattern = /^\d{5}$/;
-        const valid = zipCodePattern.test(event.target.value);
+        const cityNamePattern = /^[a-z ]+$/i;
+        const valid = cityNamePattern.test(event.target.value);
         if (!valid) {
-            setValidationError('* should be a 5 digit number only');
+            setValidationError('* should be letters and spaces only');
             props.clearResponse();
         } else {
             setValidationError('');
-            props.onZipChange(event.target.value);
+            props.onCityChange(event.target.value);
         }
     };
 
@@ -30,7 +30,7 @@ function Zip(props) {
                         type="text" 
                         className="form-control" 
                         id="usr" 
-                        placeholder="US Zip Code (5 digit)"
+                        placeholder="NZ City Name"
                         onKeyPress={(event) => {
                             if (event.key === "Enter") {
                                 validate(event);
@@ -46,4 +46,4 @@ function Zip(props) {
     );
 }
 
-export default Zip
+export default City
